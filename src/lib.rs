@@ -28,6 +28,7 @@ impl GameConstants {
 }
 
 struct Position {
+    gc: &GameConstants,
     offset: u32,
 }
 
@@ -67,11 +68,33 @@ impl Position {
 
         Position { offset }
     }
+
+    fn coordinates(&self, gc: &GameConstants) -> (u32, u32, u32) {
+        let (layer, x, y) = self.coordinates_0_based();
+        (layer + 1, x + 1, y + 1)
+    }
+
+    fn coordinates_0_based(&self) -> (u32, u32, u32) {
+        todo!()
+    }
 }
+
+struct PositionSet {
+    positions: u64,
+}
+
+impl PositionSet {}
+
+struct Board {
+    white_pieces: PositionSet,
+    black_pieces: PositionSet,
+}
+
+impl Board {}
 
 #[cfg(test)]
 mod tests {
-    use crate::GameConstants;
+    use crate::{GameConstants, Position};
 
     #[test]
     fn can_create_a_four_layer_game() {
@@ -91,5 +114,35 @@ mod tests {
         assert_eq!(gc.bit_offset_for_layer(2), 1);
         assert_eq!(gc.bit_offset_for_layer(1), 5);
         assert_eq!(gc.bit_offset_for_layer(0), 14);
+    }
+
+    #[test]
+    fn position_construction_and_getters() {
+        let gc = GameConstants::build(3).unwrap();
+        let position = Position::build(&gc, 1, 2, 3).unwrap();
+        let (layer, x, y) = position.coordinates();
+        assert_eq!(layer, 1);
+        assert_eq!(x, 2);
+        assert_eq!(y, 3);
+        let (layer, x, y) = position.coordinates_0_based();
+        assert_eq!(layer, 0);
+        assert_eq!(x, 1);
+        assert_eq!(y, 2);
+    }
+    #[test]
+    fn valid_positions() {
+        let gc = GameConstants::build(2).unwrap();
+        let positions = [
+            Position::build(&gc, 1, 1, 1),
+            Position::build(&gc, 1, 1, 2),
+            Position::build(&gc, 1, 2, 1),
+            Position::build(&gc, 1, 2, 2),
+            Position::build(&gc, 2, 1, 1),
+        ];
+    }
+    #[test]
+    fn invalid_positions() {
+        let gc = GameConstants::build(2).unwrap();
+        let positions = [Position::build(&gc, 0, 0, 9)];
     }
 }
