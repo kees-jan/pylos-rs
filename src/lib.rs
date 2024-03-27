@@ -55,7 +55,17 @@ struct PositionSet {
     positions: u64,
 }
 
-impl PositionSet {}
+impl PositionSet {
+    fn new() -> PositionSet {
+        PositionSet { positions: 0 }
+    }
+    fn contains(&self, p: &Position) -> bool {
+        !matches!(self.positions & (1 << p.offset), 0)
+    }
+    fn insert(&mut self, p: &Position) {
+        self.positions |= (1 << p.offset);
+    }
+}
 
 struct Board {
     white_pieces: PositionSet,
@@ -67,7 +77,7 @@ impl Board {}
 #[cfg(test)]
 mod tests {
     use crate::coordinate_conversions::GameConstants;
-    use crate::Position;
+    use crate::{Position, PositionSet};
 
     #[test]
     fn position_construction_and_getters() {
@@ -101,5 +111,19 @@ mod tests {
         ];
 
         assert_eq!(None, positions.into_iter().find(|p| p.is_ok()));
+    }
+
+    #[test]
+    fn can_add_position_to_set() {
+        let gc = GameConstants::build(2).unwrap();
+        let p1 = Position::build(&gc, 2, 1, 1).unwrap();
+        let p2 = Position::build(&gc, 1, 2, 1).unwrap();
+        let mut position_set = PositionSet::new();
+        position_set.insert(&p1);
+        assert!(position_set.contains(&p1));
+        assert!(!position_set.contains(&p2));
+        position_set.insert(&p2);
+        assert!(position_set.contains(&p1));
+        assert!(position_set.contains(&p2));
     }
 }
