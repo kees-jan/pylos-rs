@@ -51,6 +51,7 @@ impl Position<'_> {
     }
 }
 
+#[derive(Debug, PartialEq, Clone)]
 struct PositionSet {
     positions: u64,
 }
@@ -63,7 +64,29 @@ impl PositionSet {
         !matches!(self.positions & (1 << p.offset), 0)
     }
     fn insert(&mut self, p: &Position) {
-        self.positions |= (1 << p.offset);
+        self.positions |= 1 << p.offset;
+    }
+
+    fn remove(&mut self, p: &Position) {
+        self.positions &= !(1 << p.offset);
+    }
+
+    fn union(&self, other: &PositionSet) -> PositionSet {
+        PositionSet {
+            positions: self.positions | other.positions,
+        }
+    }
+
+    fn intersection(&self, other: &PositionSet) -> PositionSet {
+        PositionSet {
+            positions: self.positions & other.positions,
+        }
+    }
+
+    fn difference(&self, other: &PositionSet) -> PositionSet {
+        PositionSet {
+            positions: self.positions & !other.positions,
+        }
     }
 }
 
@@ -125,5 +148,78 @@ mod tests {
         position_set.insert(&p2);
         assert!(position_set.contains(&p1));
         assert!(position_set.contains(&p2));
+    }
+
+    #[test]
+    fn can_remove_position_from_set() {
+        let gc = GameConstants::build(2).unwrap();
+        let p1 = Position::build(&gc, 2, 1, 1).unwrap();
+        let p2 = Position::build(&gc, 1, 2, 1).unwrap();
+        let mut position_set = PositionSet::new();
+        position_set.insert(&p1);
+        position_set.insert(&p2);
+        assert!(position_set.contains(&p1));
+        assert!(position_set.contains(&p2));
+        position_set.remove(&p2);
+        assert!(position_set.contains(&p1));
+        assert!(!position_set.contains(&p2));
+    }
+
+    #[test]
+    fn set_union() {
+        let gc = GameConstants::build(2).unwrap();
+        let p1 = Position::build(&gc, 2, 1, 1).unwrap();
+        let p2 = Position::build(&gc, 1, 2, 1).unwrap();
+        let p3 = Position::build(&gc, 1, 1, 1).unwrap();
+        let p4 = Position::build(&gc, 1, 1, 2).unwrap();
+        let mut set1 = PositionSet::new();
+        let mut set2 = PositionSet::new();
+        set1.insert(&p1);
+        set1.insert(&p2);
+        set2.insert(&p2);
+        set2.insert(&p3);
+        assert_eq!(set1, set1);
+        assert_ne!(set1, set2);
+        let union = set1.union(&set2);
+        assert!(union.contains(&p1));
+        assert!(union.contains(&p2));
+        assert!(union.contains(&p3));
+        assert!(!union.contains(&p4));
+    }
+
+    #[test]
+    fn set_intersection() {
+        let gc = GameConstants::build(2).unwrap();
+        let p1 = Position::build(&gc, 2, 1, 1).unwrap();
+        let p2 = Position::build(&gc, 1, 2, 1).unwrap();
+        let p3 = Position::build(&gc, 1, 1, 1).unwrap();
+        let mut set1 = PositionSet::new();
+        let mut set2 = PositionSet::new();
+        set1.insert(&p1);
+        set1.insert(&p2);
+        set2.insert(&p2);
+        set2.insert(&p3);
+        let intersection = set1.intersection(&set2);
+        assert!(!intersection.contains(&p1));
+        assert!(intersection.contains(&p2));
+        assert!(!intersection.contains(&p3));
+    }
+
+    #[test]
+    fn set_difference() {
+        let gc = GameConstants::build(2).unwrap();
+        let p1 = Position::build(&gc, 2, 1, 1).unwrap();
+        let p2 = Position::build(&gc, 1, 2, 1).unwrap();
+        let p3 = Position::build(&gc, 1, 1, 1).unwrap();
+        let mut set1 = PositionSet::new();
+        let mut set2 = PositionSet::new();
+        set1.insert(&p1);
+        set1.insert(&p2);
+        set2.insert(&p2);
+        set2.insert(&p3);
+        let difference = set1.difference(&set2);
+        assert!(difference.contains(&p1));
+        assert!(!difference.contains(&p2));
+        assert!(!difference.contains(&p3));
     }
 }
