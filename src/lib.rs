@@ -1,27 +1,11 @@
 use crate::coordinate_conversions::{
     coordinates_0_based_from_offset, offset_from_0_based_coordinates, size_for_layer_0_based,
-    total_positions_for_layer_count,
+    GameConstants,
 };
 
 pub type PylosResult<T> = Result<T, String>;
 
 mod coordinate_conversions;
-
-#[derive(Debug, PartialEq)]
-struct GameConstants {
-    layers: u32,
-}
-
-impl GameConstants {
-    fn build(layers: u32) -> PylosResult<GameConstants> {
-        let total_balls = total_positions_for_layer_count(layers);
-        if total_balls > 64 {
-            return Err(format!("A game with {layers} layers needs {total_balls} balls, which is more than supported"));
-        }
-
-        Ok(GameConstants { layers })
-    }
-}
 
 #[derive(Debug, PartialEq, Clone)]
 struct Position<'a> {
@@ -82,17 +66,8 @@ impl Board {}
 
 #[cfg(test)]
 mod tests {
-    use crate::{GameConstants, Position};
-
-    #[test]
-    fn can_create_a_four_layer_game() {
-        GameConstants::build(4).unwrap();
-    }
-
-    #[test]
-    fn cant_create_a_ten_layer_game() {
-        assert!(GameConstants::build(10).is_err());
-    }
+    use crate::coordinate_conversions::GameConstants;
+    use crate::Position;
 
     #[test]
     fn position_construction_and_getters() {

@@ -1,3 +1,5 @@
+use crate::PylosResult;
+
 pub fn total_positions_for_layer_count(layers: u32) -> u32 {
     layers * (layers + 1) * (2 * layers + 1) / 6
 }
@@ -33,8 +35,26 @@ pub fn coordinates_0_based_from_offset(offset: u32) -> (u32, u32, u32) {
     (layer, x, y)
 }
 
+#[derive(Debug, PartialEq)]
+pub struct GameConstants {
+    pub layers: u32,
+}
+
+impl GameConstants {
+    pub fn build(layers: u32) -> PylosResult<GameConstants> {
+        let total_balls = total_positions_for_layer_count(layers);
+        if total_balls > 64 {
+            return Err(format!("A game with {layers} layers needs {total_balls} balls, which is more than supported"));
+        }
+
+        Ok(GameConstants { layers })
+    }
+}
+
 #[cfg(test)]
 mod tests {
+    use crate::coordinate_conversions::GameConstants;
+
     #[test]
     fn bit_offset_for_layer() {
         assert_eq!(super::bit_offset_for_layer_0_based(3), 14);
@@ -56,5 +76,15 @@ mod tests {
         assert_eq!(layer, 3);
         assert_eq!(x, 3);
         assert_eq!(y, 3);
+    }
+
+    #[test]
+    fn can_create_a_four_layer_game() {
+        GameConstants::build(4).unwrap();
+    }
+
+    #[test]
+    fn cant_create_a_ten_layer_game() {
+        assert!(GameConstants::build(10).is_err());
     }
 }
