@@ -2,6 +2,7 @@ use crate::coordinate_conversions::{
     coordinates_0_based_from_offset, offset_from_0_based_coordinates, size_for_layer_0_based,
     GameConstants,
 };
+use std::collections::HashMap;
 
 pub type PylosResult<T> = Result<T, String>;
 
@@ -89,6 +90,10 @@ impl PositionSet {
     }
 }
 
+fn get_position_supports(gc: &GameConstants) -> HashMap<Position, PositionSet> {
+    HashMap::new()
+}
+
 struct Board {
     white_pieces: PositionSet,
     black_pieces: PositionSet,
@@ -99,7 +104,7 @@ impl Board {}
 #[cfg(test)]
 mod tests {
     use crate::coordinate_conversions::GameConstants;
-    use crate::{Position, PositionSet};
+    use crate::{get_position_supports, Position, PositionSet};
 
     #[test]
     fn position_construction_and_getters() {
@@ -220,5 +225,18 @@ mod tests {
         assert!(difference.contains(&p1));
         assert!(!difference.contains(&p2));
         assert!(!difference.contains(&p3));
+    }
+
+    #[test]
+    fn all_positions_in_layer() {}
+
+    #[test]
+    fn supported_positions() {
+        let gc = GameConstants::build(2).unwrap();
+        let supports = get_position_supports(&gc);
+
+        // Bottom layer
+        // TODO: Create a function that creates a PositionSet generating all valid positions for a layer
+        // Then iterate over that, to verify that they need no supports
     }
 }

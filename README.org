@@ -1,12 +1,28 @@
-- [ ] Currently working on Position and PositionSet
+- I've just written all_positions_for_layer_0_based
+  - [ ] Integate into PositionSet and test
+- Thinking about efficiently determining which balls can be removed
+  - In the current representation, computing the support needed needs
+    to be done with a series of shifts and ors, layer by layer, row by
+    row
+  - If each layer had the same amount of balls (which whould be a
+    waste), then things could be done more efficiently
+  - Does rust have an arbitrarily large bitset?
 
 
-- [ ] Ultimate goal: Generate a list of valid moves
-  - [ ] Create a board containing black and white balls
-    - [ ] Create a PositionSet
-      - [ ] Create a Position
+- [-] Ultimate goal: Generate a list of valid moves
+  - [X] Create a board containing black and white balls
+  - [X] Create a PositionSet
+  - [X] Create a Position
   - [ ] For each possible position on the board, create a set of
     positions that need to be filled for support
+    - [ ] Create a function that creates a PositionSet generating all
+      valid positions for a layer
+      - [ ] Create the function
+        - [ ] somewhere in coordinate_conversions
+        - [ ] as a member of PositionSet
+      - [ ] Create tests
+    - [ ] Continue writing the test
+
   - [ ] Any position that is valid is now a valid move
   - [ ] A move consists of
     - Placing a ball

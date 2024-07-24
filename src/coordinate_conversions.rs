@@ -12,6 +12,13 @@ fn bit_offset_for_layer_0_based(layer: u32) -> u32 {
     total_positions_for_layer_count(layer)
 }
 
+fn all_positions_for_layer_0_based(layer: u32) -> u64 {
+    let start = total_positions_for_layer_count(layer);
+    let finish = total_positions_for_layer_count(layer + 1);
+
+    (1 << (finish - start) - 1) << start
+}
+
 pub fn offset_from_0_based_coordinates(layer: u32, x: u32, y: u32) -> u32 {
     let offset = bit_offset_for_layer_0_based(layer) + y * size_for_layer_0_based(layer) + x;
     assert!(offset < 64);
