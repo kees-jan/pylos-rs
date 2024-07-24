@@ -66,7 +66,6 @@ impl PositionSet {
     fn insert(&mut self, p: &Position) {
         self.positions |= 1 << p.offset;
     }
-
     fn remove(&mut self, p: &Position) {
         self.positions &= !(1 << p.offset);
     }

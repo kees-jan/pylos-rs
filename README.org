@@ -1,0 +1,15 @@
+- [ ] Currently working on Position and PositionSet
+
+
+- [ ] Ultimate goal: Generate a list of valid moves
+  - [ ] Create a board containing black and white balls
+    - [ ] Create a PositionSet
+      - [ ] Create a Position
+  - [ ] For each possible position on the board, create a set of
+    positions that need to be filled for support
+  - [ ] Any position that is valid is now a valid move
+  - [ ] A move consists of
+    - Placing a ball
+    - Removing a ball and placing it on a higher layer
+    - If the newly placed ball completes a square of four, remove any
+      two balls that can be removed
